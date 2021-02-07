@@ -16,3 +16,37 @@ def welcome():
         f"/api/v1.0/start/end"
      )
 
+@app.route("/api/v1.0/precipitation")
+def precipitation():
+    # Create our session (link) from Python to the DB
+    session = Session(engine)
+
+    #Return a list of rain data including the date and prcp of each date
+    rain_data = session.query(Measurement.date, Measurement.prcp).all()
+
+    session.close()
+
+    # Create a dictionary from the row data and append to a list of HI_rain
+    HI_rain = []
+    for date, prcp in rain_data:
+        rain_dict = {}
+        rain_dict["date"] = date
+        rain_dict["prcp"] = prcp
+        HI_rain.append(rain_dict)
+
+    return jsonify(HI_rain)
+
+@app.route("/api/v1.0/stations")
+def stations():
+    # Create our session (link) from Python to the DB
+    session = Session(engine)
+
+    all_stations = session.query(Station.station).distinct.all()
+
+    session.close()
+
+    return jsonify(all_stations)
+
+
+
+
