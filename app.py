@@ -112,8 +112,35 @@ def tobs():
     return jsonify(all_tobs)
     
 
+@app.route("/api/v1.0/<start>")
+def temp_stats(start):
+    # Create our session (link) from Python to the DB
+    session = Session(engine)
+
+    temps_start = session.query(func.min(Measurement.tobs), func.max(Measurement.tobs), func.avg(Measurement.tobs)).\
+                  filter(Measurement.date >= start).all()
+
+    session.close()
+
+    statline = [temps_start[0][0], temps_start[0][1], round(temps_start[0][2],2)]
+
+    return jsonify(statline)
 
 
+@app.route("/api/v1.0/<start>/<end>")
+def temp_stats_2(start, end):
+    # Create our session (link) from Python to the DB
+    session = Session(engine)
+
+    temps_start_end = session.query(func.min(Measurement.tobs), func.max(Measurement.tobs), func.avg(Measurement.tobs)).\
+                  filter(Measurement.date >= start).\
+                  filter(Measurement.date <= end).all()
+
+    session.close()
+
+    statline = [temps_start_end[0][0], temps_start_end[0][1], round(temps_start_end[0][2],2)]
+
+    return jsonify(statline)
 
 
 if __name__ == '__main__':
